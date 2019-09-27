@@ -2,10 +2,9 @@ package csvFilter
 
 class CsvFilter {
     private val percentage: Double = 1.0/100
-    private val ids : MutableMap<String, Int> = mutableMapOf()
+    private var ids : Map<String, Int> = mapOf()
 
     fun apply(lines: List<String>) : List<String> {
-        ids.clear()
         val noHeader = lines.size <= 1
         if (noHeader){
             return listOf("")
@@ -13,16 +12,9 @@ class CsvFilter {
         var result = mutableListOf<String>()
         result.add(lines[0])
         val invoices = lines.slice(IntRange(1, lines.size - 1))
-        invoices.forEach {  invoice ->
-            val idField = invoice.split(',')[0]
-            val value = if (ids[idField] == null) 1 else ids[idField]!!.plus(1)
-            ids[idField] = value
-        }
-        invoices.forEach {invoice ->
-            if (lineFilter(invoice)){
-                result.add(invoice)
-            }
-        }
+        ids = invoices.groupingBy { it.split(',')[0] }.eachCount()
+        val goodInvoices = invoices.filter { invoice -> lineFilter(invoice) }
+        result.addAll(goodInvoices)
         return result.toList()
     }
 
