@@ -9,6 +9,7 @@ class Csv(val header : String,
     ) {
         fun header(header: String) = apply { this.header = header }
         fun appendLine(invoice: CsvInvoice ) = apply { this.invoices.add(invoice) }
+        fun appendAll(vararg invoices: CsvInvoice ) = apply { this.invoices.addAll(invoices) }
         fun build() = Csv(header, invoices)
     }
 

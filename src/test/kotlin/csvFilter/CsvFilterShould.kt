@@ -158,9 +158,8 @@ class CsvFilterShould {
     @Test
     fun tax_fields_must_be_decimals_and_exclusive_multiple_lines() {
         val goodLine = CsvInvoice.Builder().invoiceId("2").ivaTax("19").igicTax(emptyField).build()
-        val lines = Csv.Builder().appendLine(
-            CsvInvoice.Builder().ivaTax("19").igicTax("XYZ").build()
-        ).appendLine(
+        val lines = Csv.Builder().appendAll(
+            CsvInvoice.Builder().ivaTax("19").igicTax("XYZ").build(),
             goodLine
         ).build().toList()
 
@@ -171,9 +170,8 @@ class CsvFilterShould {
 
     @Test
     fun lines_with_same_id_must_be_eliminated() {
-        val lines = Csv.Builder().appendLine(
-            CsvInvoice.Builder().invoiceId("1").ivaTax("19").igicTax("XYZ").build()
-        ).appendLine(
+        val lines = Csv.Builder().appendAll(
+            CsvInvoice.Builder().invoiceId("1").ivaTax("19").igicTax("XYZ").build(),
             CsvInvoice.Builder().invoiceId("1").ivaTax("19").igicTax(emptyField).build()
         ).build().toList()
 
@@ -184,7 +182,7 @@ class CsvFilterShould {
 
     @Test
     fun empty_input_must_output_empty_list() {
-        val lines = Csv.Builder().header("").build().toList()
+        val lines = listOf<String>()
 
         val result = filter.apply(lines)
 
