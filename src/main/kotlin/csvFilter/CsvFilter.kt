@@ -28,25 +28,36 @@ class CsvFilter {
     private fun lineFilter(line : String):Boolean{
         val fields = line.split(',')
         val idField = fields[idFieldIndex]
-        if (line.isNullOrEmpty() || (ids[idField]!! > 1)){return false}
+        if (line.isNullOrEmpty() || ids.getValue(idField) > 1){return false}
         val grossField = fields[grossAmountIndex]
         val netField = fields[netAmountIndex]
         val ivaField = fields[ivaFieldIndex]
         val igicField = fields[igicFieldIndex]
         val cifField = fields[cifFieldIndex]
         val nifField = fields[nifFieldIndex]
-        val decimalRegex = "\\d+(\\.\\d+)?".toRegex()
-        val taxFieldsAreMutuallyExclusive =
-            (ivaField.matches(decimalRegex) || igicField.matches(decimalRegex)) &&
-                    (ivaField.isNullOrEmpty() || igicField.isNullOrEmpty())
-        val idFieldsAreMutuallyExclusive = (cifField.isNullOrEmpty() xor nifField.isNullOrEmpty())
-        if (taxFieldsAreMutuallyExclusive && idFieldsAreMutuallyExclusive && grossField.matches(decimalRegex) && netField.matches(decimalRegex)) {
+        val fieldAreWellFormated = invoiceHasGoodTypeFormat(fields)
+        val taxFieldsAreMutuallyExclusive = ivaField.isNullOrEmpty() xor igicField.isNullOrEmpty()
+        val idFieldsAreMutuallyExclusive = cifField.isNullOrEmpty() xor nifField.isNullOrEmpty()
+        if (taxFieldsAreMutuallyExclusive && idFieldsAreMutuallyExclusive && fieldAreWellFormated) {
             val tax : Double = if (ivaField.isNullOrEmpty()) igicField.toDouble() else ivaField.toDouble()
             if (grossField.toDouble() - grossField.toDouble()*tax*percentage == netField.toDouble()) {
                 return true
             }
         }
         return false
+    }
+
+    private fun invoiceHasGoodTypeFormat(invoice: List<String>): Boolean{
+        val decimalRegex = "\\d+(\\.\\d+)?".toRegex()
+        val ivaField = invoice[ivaFieldIndex]
+        val igicField = invoice[igicFieldIndex]
+        val grossField = invoice[grossAmountIndex]
+        val netAmount = invoice[netAmountIndex]
+
+        return (ivaField.matches(decimalRegex) || ivaField.isNullOrEmpty()) &&
+                (igicField.matches(decimalRegex) || igicField.isNullOrEmpty()) &&
+                (grossField.matches(decimalRegex)) &&
+                (netAmount.matches(decimalRegex))
     }
 }
 
