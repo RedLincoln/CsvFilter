@@ -35,10 +35,10 @@ class CsvFilter {
         val igicField = fields[igicFieldIndex]
         val cifField = fields[cifFieldIndex]
         val nifField = fields[nifFieldIndex]
-        val fieldAreWellFormated = invoiceHasGoodTypeFormat(fields)
+        val fieldAreWellFormatted = invoiceHasGoodTypeFormat(fields)
         val taxFieldsAreMutuallyExclusive = ivaField.isNullOrEmpty() xor igicField.isNullOrEmpty()
         val idFieldsAreMutuallyExclusive = cifField.isNullOrEmpty() xor nifField.isNullOrEmpty()
-        if (taxFieldsAreMutuallyExclusive && idFieldsAreMutuallyExclusive && fieldAreWellFormated) {
+        if (taxFieldsAreMutuallyExclusive && idFieldsAreMutuallyExclusive && fieldAreWellFormatted) {
             val tax : Double = if (ivaField.isNullOrEmpty()) igicField.toDouble() else ivaField.toDouble()
             if (grossField.toDouble() - grossField.toDouble()*tax*percentage == netField.toDouble()) {
                 return true
@@ -49,15 +49,18 @@ class CsvFilter {
 
     private fun invoiceHasGoodTypeFormat(invoice: List<String>): Boolean{
         val decimalRegex = "\\d+(\\.\\d+)?".toRegex()
+        val cifRegex = "([A-Z])\\d{8}".toRegex()
         val ivaField = invoice[ivaFieldIndex]
         val igicField = invoice[igicFieldIndex]
         val grossField = invoice[grossAmountIndex]
-        val netAmount = invoice[netAmountIndex]
+        val netField = invoice[netAmountIndex]
+        val cifField = invoice[cifFieldIndex]
 
         return (ivaField.matches(decimalRegex) || ivaField.isNullOrEmpty()) &&
                 (igicField.matches(decimalRegex) || igicField.isNullOrEmpty()) &&
                 (grossField.matches(decimalRegex)) &&
-                (netAmount.matches(decimalRegex))
+                (netField.matches(decimalRegex)) &&
+                (cifField.matches(cifRegex) ||cifField.isNullOrEmpty())
     }
 }
 

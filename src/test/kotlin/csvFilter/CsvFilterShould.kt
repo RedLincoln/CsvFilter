@@ -211,4 +211,17 @@ class CsvFilterShould {
         assertThat(result).isEqualTo(emptyDataFile)
     }
 
+    @Test
+    fun cif_number_must_be_valid(){
+        val lines = Csv.Builder().appendLine(
+            CsvInvoice.Builder().cif("XYZ").build()
+        ).build().toList()
+
+        val result =  filter.apply(lines)
+
+        assertThat(result).isEqualTo(emptyDataFile)
+    }
+
+
+
 }
