@@ -189,4 +189,15 @@ class CsvFilterShould {
         assertThat(result).isEqualTo(listOf(emptyField))
     }
 
+    @Test
+    fun gross_must_be_decimal(){
+        val lines = Csv.Builder().appendLine(
+            CsvInvoice.Builder().grossAmount("XYZ").build()
+        ).build().toList()
+
+        val result =  filter.apply(lines)
+
+        assertThat(result).isEqualTo(emptyDataFile)
+    }
+
 }
