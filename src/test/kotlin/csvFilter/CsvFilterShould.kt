@@ -200,4 +200,15 @@ class CsvFilterShould {
         assertThat(result).isEqualTo(emptyDataFile)
     }
 
+    @Test
+    fun net_must_be_decimal(){
+        val lines = Csv.Builder().appendLine(
+            CsvInvoice.Builder().netAmount("XYZ").build()
+        ).build().toList()
+
+        val result =  filter.apply(lines)
+
+        assertThat(result).isEqualTo(emptyDataFile)
+    }
+
 }

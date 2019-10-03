@@ -40,7 +40,7 @@ class CsvFilter {
             (ivaField.matches(decimalRegex) || igicField.matches(decimalRegex)) &&
                     (ivaField.isNullOrEmpty() || igicField.isNullOrEmpty())
         val idFieldsAreMutuallyExclusive = (cifField.isNullOrEmpty() xor nifField.isNullOrEmpty())
-        if (taxFieldsAreMutuallyExclusive && idFieldsAreMutuallyExclusive && grossField.matches(decimalRegex)) {
+        if (taxFieldsAreMutuallyExclusive && idFieldsAreMutuallyExclusive && grossField.matches(decimalRegex) && netField.matches(decimalRegex)) {
             val tax : Double = if (ivaField.isNullOrEmpty()) igicField.toDouble() else ivaField.toDouble()
             if (grossField.toDouble() - grossField.toDouble()*tax*percentage == netField.toDouble()) {
                 return true
