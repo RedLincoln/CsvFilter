@@ -55,12 +55,37 @@ class CsvFilter {
         val grossField = invoice[grossAmountIndex]
         val netField = invoice[netAmountIndex]
         val cifField = invoice[cifFieldIndex]
+        val nifField =  invoice[nifFieldIndex]
 
         return (ivaField.matches(decimalRegex) || ivaField.isNullOrEmpty()) &&
                 (igicField.matches(decimalRegex) || igicField.isNullOrEmpty()) &&
                 (grossField.matches(decimalRegex)) &&
                 (netField.matches(decimalRegex)) &&
-                (cifField.matches(cifRegex) ||cifField.isNullOrEmpty())
+                (cifField.matches(cifRegex) ||cifField.isNullOrEmpty()) &&
+                (nifFieldCheck((nifField)) || nifField.isNullOrEmpty())
+    }
+
+    private fun nifFieldCheck(nifField: String ): Boolean{
+        val nifReadToBeChecked: String
+        val validCheckLetters = "TRWAGMYFPDXBNJZSQVHLCKE"
+        val validNieStartLetterS = "XYZ"
+        val dniRegex = "\\d{8}[A-Z]".toRegex()
+        val nieRegex = ("[$validNieStartLetterS]\\d{7}[$validCheckLetters]").toRegex()
+        nifReadToBeChecked = if (nifField.matches(nieRegex)) {
+            validCheckLetters.indexOf(nifField[0]).toString() +
+                    nifField.substring(1, nifField.lastIndex)
+        } else if (nifField.matches(dniRegex)){
+            nifField
+        } else {
+            return false
+        }
+
+        val remainder = nifReadToBeChecked.substring(0, nifField.lastIndex ).toInt() % validCheckLetters.length
+
+        if (validCheckLetters[remainder] == nifReadToBeChecked[nifReadToBeChecked.lastIndex]){
+            return true
+        }
+        return false
     }
 }
 

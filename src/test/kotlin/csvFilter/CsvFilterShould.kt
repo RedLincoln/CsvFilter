@@ -127,7 +127,7 @@ class CsvFilterShould {
     @Test
     fun id_fields_are_mutually_exclusive() {
         val lines = Csv.Builder().appendLine(
-            CsvInvoice.Builder().cif("B76430134").nif("X7225252Y").build()
+            CsvInvoice.Builder().cif("B76430134").nif("12345678Z").build()
         ).build().toList()
 
         val result = filter.apply(lines)
@@ -138,7 +138,7 @@ class CsvFilterShould {
     @Test
     fun id_fields_are_mutually_exclusive_nif_set() {
         val lines = Csv.Builder().appendLine(
-            CsvInvoice.Builder().cif(emptyField).nif("X7225252Y").build()
+            CsvInvoice.Builder().cif(emptyField).nif("12345678Z").build()
         ).build().toList()
 
         val result = filter.apply(lines)
@@ -214,7 +214,7 @@ class CsvFilterShould {
     @Test
     fun cif_number_must_be_valid(){
         val lines = Csv.Builder().appendLine(
-            CsvInvoice.Builder().cif("XYZ").build()
+            CsvInvoice.Builder().cif("XYZ").nif(emptyField).build()
         ).build().toList()
 
         val result =  filter.apply(lines)
@@ -222,6 +222,16 @@ class CsvFilterShould {
         assertThat(result).isEqualTo(emptyDataFile)
     }
 
+    @Test
+    fun nif_number_must_be_valid(){
+        val lines = Csv.Builder().appendLine(
+            CsvInvoice.Builder().nif("XYZ").cif(emptyField).build()
+        ).build().toList()
+
+        val result =  filter.apply(lines)
+
+        assertThat(result).isEqualTo(emptyDataFile)
+    }
 
 
 }
